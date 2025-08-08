@@ -9,6 +9,17 @@ from telegram.constants import ParseMode
 from telegram.ext import (
     ApplicationBuilder, CommandHandler, ContextTypes,
 )
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("help", help_cmd))
+    app.add_handler(CommandHandler("add", add_cmd))
+    app.add_handler(CommandHandler("remove", remove_cmd))
+    app.add_handler(CommandHandler("list", list_cmd))
+    app.add_handler(CommandHandler("clear", clear_cmd))
+
+    print("Bot starting…")
+    asyncio.create_task(poll_loop(app))
+    print("Background poller started.")
+    await app.run_polling(close_loop=False)
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
 DEX_API = "https://api.dexscreener.com/latest/dex/tokens/{contract}"
