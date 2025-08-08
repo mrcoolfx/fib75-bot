@@ -73,20 +73,6 @@ async def fetch_top_pair(contract: str) -> Optional[Dict[str, Any]]:
 
     return best[1] if best else None
 
-async def poll_loop(application):
-    # Simple forever loop: run every POLL_SECONDS
-    while True:
-        # We need a minimal context-like object with a bot
-        class Ctx:
-            bot = application.bot
-        try:
-            await poll_job(Ctx)  # reuse your existing poll_job
-        except Exception:
-            # swallow errors so the loop never dies
-            pass
-        await asyncio.sleep(POLL_SECONDS)
-
-
 async def get_price_usd_from_pair(pair: Dict[str, Any]) -> Optional[Decimal]:
     try:
         price_str = pair.get("priceUsd")
@@ -264,6 +250,19 @@ async def clear_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ensure_chat(chat_id)
     chat_state[chat_id].clear()
     await update.message.reply_text("Cleared all tracked contracts for this chat.")
+
+async def poll_loop(application):
+    # Simple forever loop: run every POLL_SECONDS
+    while True:
+        # We need a minimal context-like object with a bot
+        class Ctx:
+            bot = application.bot
+        try:
+            await poll_job(Ctx)  # reuse your existing poll_job
+        except Exception:
+            # swallow errors so the loop never dies
+            pass
+        await asyncio.sleep(POLL_SECONDS)
 
 async def main():
     if not TELEGRAM_TOKEN:
