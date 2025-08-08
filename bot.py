@@ -62,6 +62,20 @@ async def fetch_top_pair(contract: str) -> Optional[Dict[str, Any]]:
 
     return best[1] if best else None
 
+async def poll_loop(application):
+    # Simple forever loop: run every POLL_SECONDS
+    while True:
+        # We need a minimal context-like object with a bot
+        class Ctx:
+            bot = application.bot
+        try:
+            await poll_job(Ctx)  # reuse your existing poll_job
+        except Exception:
+            # swallow errors so the loop never dies
+            pass
+        await asyncio.sleep(POLL_SECONDS)
+
+
 async def get_price_usd_from_pair(pair: Dict[str, Any]) -> Optional[Decimal]:
     try:
         price_str = pair.get("priceUsd")
@@ -246,7 +260,6 @@ async def main():
     app = (
         ApplicationBuilder()
         .token(TELEGRAM_TOKEN)
-        .rate_limiter(AIORateLimiter())
         .build()
     )
 
@@ -256,8 +269,6 @@ async def main():
     app.add_handler(CommandHandler("remove", remove_cmd))
     app.add_handler(CommandHandler("list", list_cmd))
     app.add_handler(CommandHandler("clear", clear_cmd))
-
-    app.job_queue.run_repeating(poll_job, interval=POLL_SECONDS, first=10)
 
     print("Bot started. Press Ctrl+C to stop.")
     await app.run_polling(close_loop=False)
