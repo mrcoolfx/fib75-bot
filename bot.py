@@ -7,7 +7,7 @@ import httpx
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import (
-    ApplicationBuilder, CommandHandler, ContextTypes, AIORateLimiter
+    ApplicationBuilder, CommandHandler, ContextTypes,
 )
 
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
